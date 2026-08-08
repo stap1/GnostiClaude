@@ -58,6 +58,10 @@ UI = {
            "nav_label": "Sections", "nav_wheel": "Wheel", "nav_pos": "Positions",
            "nav_dig": "Dignity", "nav_asp": "Aspects", "nav_houses": "Houses",
            "nav_sig": "Signature", "nav_read": "Reading",
+           "nav_tozs": "Identity", "nav_mech": "Mechanism",
+           "mech_title": "⚙ The chart's mechanism",
+           "mech_hint": "Positions, dignities and the aspect grid — the "
+           "movement behind the reading. Unfold to inspect the works.",
            "totop": "Back to top",
            "chip_ruler": "Chart ruler", "chip_elem": "Element",
            "chip_mode": "Mode", "chip_tight": "Tightest aspect",
@@ -83,6 +87,10 @@ UI = {
            "nav_label": "Sekcje", "nav_wheel": "Koło", "nav_pos": "Pozycje",
            "nav_dig": "Godność", "nav_asp": "Aspekty", "nav_houses": "Domy",
            "nav_sig": "Sygnatura", "nav_read": "Odczyt",
+           "nav_tozs": "Tożsamość", "nav_mech": "Mechanizm",
+           "mech_title": "⚙ Mechanizm karty",
+           "mech_hint": "Pozycje, godności i siatka aspektów — praca trybów "
+           "za odczytem. Rozwiń, by zajrzeć do werku.",
            "totop": "Na górę strony",
            "chip_ruler": "Władca karty", "chip_elem": "Żywioł",
            "chip_mode": "Jakość", "chip_tight": "Najściślejszy aspekt",
@@ -479,6 +487,26 @@ header.title h1,header.title .glyphs{position:relative;z-index:1}
 .timeline .tl-full{fill:var(--bg);stroke:var(--gold);stroke-width:1.5}
 .tl-legend{color:var(--muted);font-size:13.5px;font-style:italic;
   margin:8px 2px 0}
+/* skeleton: dane w prozie szeptem, werk przytłumiony do najechania */
+.datum{font-size:.86em;color:var(--muted);
+  font-variant-numeric:tabular-nums;transition:color .2s}
+.prose p:hover .datum,.prose p:focus-within .datum{color:var(--ink)}
+section#mechanizm>h2{cursor:pointer;position:relative;padding-right:34px;
+  -webkit-user-select:none;user-select:none}
+section#mechanizm>h2::after{content:'▾';position:absolute;right:8px;
+  color:var(--gold-dim);transition:transform .2s}
+section#mechanizm.closed>h2::after{transform:rotate(-90deg)}
+section#mechanizm.closed>*:not(h2){display:none}
+#mechanizm .scrollx{opacity:.8;filter:saturate(.7);
+  transition:opacity .3s ease,filter .3s ease}
+#mechanizm .scrollx:hover,#mechanizm .scrollx:focus-within{
+  opacity:1;filter:none}
+#mechanizm h3.mech-h3{color:var(--gold-dim);font-weight:normal;
+  font-size:16.5px;letter-spacing:.05em;margin:26px 0 8px}
+.mech-hint{color:var(--muted);font-style:italic;font-size:13.5px;
+  margin:2px 0 10px}
+@media print{section#mechanizm.closed>*{display:block}
+  #mechanizm .scrollx{opacity:1;filter:none}}
 .tipsheet{position:fixed;left:0;right:0;bottom:0;z-index:40;
   background:var(--panel);border-top:2px solid var(--gold-dim);
   box-shadow:0 -10px 30px rgba(0,0,0,.5);
@@ -658,8 +686,14 @@ def wheel_svg(chart, lang):
         x2, y2 = xy(ppos[a["b"]][0], 186)
         w = 2.6 if a["orb"] < 2 else 1.2
         op = 0.9 if a["orb"] < 2 else 0.45
+        t = L[lang]
+        chord_tip = (f"{t['planets'].get(a['a'], a['a'])} "
+                     f"{ASPECT_NAME[lang][a['aspect']]} "
+                     f"{t['planets'].get(a['b'], a['b'])} · {a['orb']:.1f}° · "
+                     f"{PHASE_WORD[lang].get(a['phase'], a['phase'])}")
         s.append(f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}"'
-                 f' class="chord {cls}" stroke-width="{w}" opacity="{op}"/>')
+                 f' class="chord {cls}" stroke-width="{w}" opacity="{op}">'
+                 f'<title>{esc(chord_tip)}</title></line>')
 
     style = """
     .ring{fill:none;stroke:var(--gold-dim);stroke-width:1.4}
@@ -684,6 +718,9 @@ def wheel_svg(chart, lang):
     .axis-lab{font-size:17px;fill:var(--gold);text-anchor:middle;
       dominant-baseline:central;font-weight:bold}
     .chord.asp-hard{stroke:var(--hard)} .chord.asp-soft{stroke:var(--soft)}
+    .chord{pointer-events:stroke;cursor:help;
+      transition:stroke-width .15s,opacity .15s}
+    .chord:hover{stroke-width:4.2;opacity:1}
     """
     desc = (f"{UI[lang]['wheel_desc']}: AC {chart['angles']['Ascendant']['position']}, "
             f"MC {chart['angles']['Midheaven']['position']}")
@@ -1037,6 +1074,15 @@ def split_long(p, limit=550, chunk=430):
     return out
 
 
+DATUM_RE = re.compile(r"(\d+°(?:\d+′)?|\d+[.,]\d+°)")
+
+
+def mute_datums(escaped):
+    """Wrap degree/orb figures in a quiet span — the skeleton-watch rule:
+    precision stays present in the prose but whispers."""
+    return DATUM_RE.sub(r"<span class='datum'>\1</span>", escaped)
+
+
 def prose_html(paras):
     out = []
     for p in paras:
@@ -1047,9 +1093,9 @@ def prose_html(paras):
             if not p:
                 continue
         if MARKER.match(p):
-            out.append(f"<p class='item'>{esc(p)}</p>")
+            out.append(f"<p class='item'>{mute_datums(esc(p))}</p>")
         else:
-            out.extend(f"<p>{esc(c)}</p>" for c in split_long(p))
+            out.extend(f"<p>{mute_datums(esc(c))}</p>" for c in split_long(p))
     return f"<div class='prose'>{''.join(out)}</div>"
 
 
@@ -1240,12 +1286,12 @@ def ambient_html():
 
 def topbar(lang, has_transits=False):
     u = UI[lang]
-    links = [("#kolo", u["nav_wheel"]), ("#pozycje", u["nav_pos"]),
-             ("#godnosc", u["nav_dig"]), ("#aspekty", u["nav_asp"]),
+    links = [("#kolo", u["nav_wheel"]), ("#tozsamosc", u["nav_tozs"]),
              ("#domy", u["nav_houses"]), ("#sygnatura", u["nav_sig"])]
     if has_transits:
         links.append(("#tranzyty", u["nav_transits"]))
     links.append(("#reading", u["nav_read"]))
+    links.append(("#mechanizm", u["nav_mech"]))
     nav = "".join(f"<a href='{h}'>{esc(n)}</a>" for h, n in links)
     return (f"<nav class='topbar' aria-label='{esc(u['nav_label'])}'>"
             f"<button class='orrery' id='totop' aria-label='{esc(u['totop'])}' "
@@ -1327,6 +1373,7 @@ UI_JS = """
     var h=s.querySelector('h2');
     if(h)h.setAttribute('aria-expanded','true');};
   secs.forEach(function(s){
+    if(s.id==='mechanizm')return;
     var h=s.querySelector('h2');
     if(!h||h.parentNode!==s)return;
     s.classList.add('tog');
@@ -1347,15 +1394,29 @@ UI_JS = """
         s.classList.add('closed');
         s.querySelector('h2').setAttribute('aria-expanded','false');});}
     else{d.body.classList.remove('acc');
-      secs.forEach(function(s){s.classList.remove('closed');
+      secs.forEach(function(s){
+        if(s.id==='mechanizm')return;
+        s.classList.remove('closed');
         var h=s.querySelector('h2');
         if(h)h.removeAttribute('aria-expanded');});}
   };
   accApply();
   if(mq.addEventListener){mq.addEventListener('change',accApply);}
   else if(mq.addListener){mq.addListener(accApply);}
+  /* the Mechanism annex folds on every viewport — the watch's case-back */
+  var mech=d.getElementById('mechanizm');
+  if(mech){
+    var mh=mech.querySelector('h2');
+    mh.setAttribute('tabindex','0');
+    var mt=function(){mech.classList.toggle('closed');
+      mh.setAttribute('aria-expanded',
+        mech.classList.contains('closed')?'false':'true');};
+    mh.addEventListener('click',mt);
+    mh.addEventListener('keydown',function(e){
+      if(e.key==='Enter'||e.key===' '){e.preventDefault();mt();}});
+  }
   var openHash=function(id){var s=id&&d.getElementById(id);
-    if(s&&s.classList.contains('tog')){open(s);}};
+    if(s&&(s.classList.contains('tog')||s.id==='mechanizm')){open(s);}};
   d.addEventListener('click',function(e){
     var a=e.target.closest?e.target.closest('a[href^="#"]'):null;
     if(a){openHash(a.getAttribute('href').slice(1));}});
@@ -1443,12 +1504,7 @@ if(_t)document.documentElement.setAttribute('data-theme',_t);}}catch(e){{}}</scr
   <div class="wheelwrap">{wheel_svg(chart, lang)}
     <div>{balance_bars(chart, lang)}</div></div>
 </section>
-<section id="pozycje"><h2>{esc(u['positions'])}</h2>{scrollx(positions_table(chart, lang), u['positions'])}
-{sec_prose('2')}</section>
-<section id="godnosc"><h2>{esc(u['dignity'])}</h2>{scrollx(dignity_table(chart, lang), u['dignity'])}
-{sec_prose('3', titled=False)}</section>
-<section id="aspekty"><h2>{esc(UI[lang]['aspect_grid'])}</h2>{scrollx(aspect_grid(chart, lang), u['aspect_grid'])}
-{scrollx(aspect_list(chart, lang), u['aspect_list'])}{sec_prose('4', titled=False)}</section>
+<section id="tozsamosc"><h2>{esc(u['nav_tozs'])}</h2>{sec_prose('2', titled=False)}</section>
 <section id="domy"><h2>{esc(u['nav_houses'])}</h2>{sec_prose('5', titled=False)}</section>
 <section id="sygnatura"><h2>{esc(u['signature'])}</h2>{signature_panel(chart, lang)}
 {sec_prose('6', titled=False)}</section>
@@ -1457,6 +1513,15 @@ if(_t)document.documentElement.setAttribute('data-theme',_t);}}catch(e){{}}</scr
   f"<p class='tl-legend'>{esc(u['tl_legend'])}</p></section>") if transits else ""}
 <section class="reading" id="reading"><h2>{esc(u['reading'])}</h2>
 {sec_prose('7')}{sec_prose('8')}{conf_html}</section>
+<section id="mechanizm" class="closed">
+<h2 aria-expanded="false">{esc(u['mech_title'])}</h2>
+<p class="mech-hint">{esc(u['mech_hint'])}</p>
+<h3 class="mech-h3">{esc(u['positions'])}</h3>{scrollx(positions_table(chart, lang), u['positions'])}
+<h3 class="mech-h3">{esc(u['dignity'])}</h3>{scrollx(dignity_table(chart, lang), u['dignity'])}
+{sec_prose('3', titled=False)}
+<h3 class="mech-h3">{esc(UI[lang]['aspect_grid'])}</h3>{scrollx(aspect_grid(chart, lang), u['aspect_grid'])}
+{scrollx(aspect_list(chart, lang), u['aspect_list'])}{sec_prose('4', titled=False)}
+</section>
 <footer><p>{esc(u['tiphint'])}</p><p>{esc(disclaimer)}</p><p>{esc(u['generated'])}</p></footer>
 </main>
 {tipsheet(lang)}

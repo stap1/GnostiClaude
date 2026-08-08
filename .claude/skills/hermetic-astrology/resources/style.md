@@ -56,6 +56,23 @@ Never repeat a coined image across the same person's readings.
   sentences; earth → concrete nouns, few adjectives; water → longer arcs;
   fire → verbs. Two different subjects' readings must not sound identical.
 
+## Engine visibility — the skeleton principle
+
+The technical apparatus is the movement of a skeleton watch: visible, even
+beautiful, but never louder than the dial.
+
+- **Orbs in prose:** the exact figure appears at ≤3 load-bearing claims per
+  reading; elsewhere write "ścisły", "luźny", "na granicy orbu". Full
+  precision lives in the MECHANIZM annex — the prose narrates, the annex
+  certifies. (The HTML additionally sets in-prose figures in a quiet
+  `datum` style.)
+- **Signatures in flow, tables in the annex:** between the wheel and the
+  interpretation only compact signatures travel (the chips row, one-line
+  "heartbeat" of ruler · sect · tightest aspects). Position/dignity/aspect
+  tables belong to the collapsed MECHANIZM section at the end of the page;
+  in HTML the wheel's chords carry hover tooltips with aspect + orb, so the
+  springs can be inspected without opening the case-back.
+
 ## What stays
 
 Data anchoring (every claim traceable to a placement), Polish astrological
