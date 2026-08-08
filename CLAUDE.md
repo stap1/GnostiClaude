@@ -91,8 +91,8 @@ The UI v2 layer (sticky topbar nav + orrery animation, header zodiac-ring sky, t
 glossary bottom sheet, summary chips, dignity mini-bars, aspect-grid heat map, degree
 dials in the positions table, mobile section accordion, light/dark theme toggle persisted
 in localStorage, transit-timeline SVG via `transits.py` + `--transits`/`--mark-date`) ships
-in `render_html.py` and is so far applied only to `blizniata_1993-06-14/..._natal_ogolny`
-(full layer) and `..._transits_sierpien-wrzesien-2026` (layer + timeline). Polish terminology (2026-08-08 audit): „Peregryn”
+in `render_html.py`; it is applied only to selected pilot readings in `output/`
+(never mass-regenerate the rest). Polish terminology (2026-08-08 audit): „Peregryn”
 (not Peregrin), „Termy” (not Term), „Losy” for Lots (not „Loty”), Mercury sect status
 „neutralny” — fixed in `render_chart.py` L and the `render_html.py` GLOSS; future
 readings inherit them automatically.

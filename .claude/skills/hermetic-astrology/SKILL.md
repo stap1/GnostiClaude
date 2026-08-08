@@ -39,6 +39,42 @@ run downloads `de421.bsp` (~17 MB) into `compute/`.
 
 ---
 
+## WELCOME MENU (bare invocation)
+
+When the skill is invoked WITHOUT a concrete task ("astrologia", "co potrafisz",
+the skill name alone), greet in the user's language with one short line and a
+numbered menu — then wait for the choice:
+
+```
+Astrologia hermetyczna — co przygotować?
+
+1 · Tranzyty na dzień  — „1” lub „tranzyty [data]” → pogoda dnia dla Twojej
+    karty (domyślnie: dziś)
+2 · Natal              — pełny horoskop urodzeniowy (data, godzina, miejsce)
+3 · Tranzyty na okres  — prognoza z kalendarium i osią czasu
+4 · Synastria          — dopasowanie dwojga + karta kompozytowa
+5 · Tranzyty relacji   — kalendarz pary na wybrane okno
+6 · Rewolucja słoneczna — tematy roku od urodzin do urodzin
+7 · Elekcja terminu    — dobry dzień i godzina planetarna na przedsięwzięcie
+```
+
+**Shortcut „tranzyty na dzień” (option 1):** `tranzyty`, `tranzyty jutro`,
+`tranzyty 15.09` → a compact one-day snapshot for THE QUERENT'S chart: cast the
+sky for that date, list exact/tight aspects to the querent's natal points (fast
+planets included), the Moon's sign + natal house, the planetary day & hour
+rulers, and a short "pogoda dnia" paragraph (no full report skeleton; save as
+`…_transits_dzien-<data>/` per the output convention only if the user wants it
+kept, otherwise answer inline).
+
+**The querent's chart:** use the natal chart the user has designated as their
+own (an existing `output/<...>/chart.json` or session memory). If none is
+known, ask ONCE for birth data and offer to remember the folder as "karta
+pytającego". NEVER hard-code anyone's birth data in this file, README, or any
+committed file — the repository is public; real charts live only in `output/`
+(git-ignored).
+
+---
+
 ## STEP 0 — INTAKE
 
 Collect and normalize:

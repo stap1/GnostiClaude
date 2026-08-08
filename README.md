@@ -24,14 +24,20 @@ i zapisuje piękne raporty — tekstowe oraz HTML z kołem horoskopu SVG.
 
 ## Jak używać
 
-W Claude Code, w katalogu projektu, po prostu poproś (po polsku lub angielsku):
+W Claude Code, w katalogu projektu, po prostu poproś (po polsku lub angielsku).
+Wszystkie daty poniżej są fikcyjne — to tylko przykłady składni:
 
 ```
 wygeneruj natal 14.06.1993, godz. 15:40, Gdańsk, Polska
-tranzyty dla bliźniąt 1993 na sierpień–wrzesień 2026
+tranzyty dla bliźniąt 1993 na marzec–kwiecień 2027
 synastria bliźnięta 1993 × skorpion 1995
 tranzyt relacji bliźnięta × skorpion na 2027
 ```
+
+Samo wywołanie skilla bez zadania pokazuje **menu powitalne** z siedmioma
+opcjami (natal, tranzyty, synastria, kompozyt, rewolucja słoneczna, elekcja)
+— w tym skrót **„tranzyty [data]"**: błyskawiczna pogoda dnia dla Twojej
+karty na wskazany dzień kalendarzowy (domyślnie dziś).
 
 Claude uruchomi silnik, złoży interpretację i zapisze wyniki w `output/`.
 Standardowo powstają **`reading.md` + `reading.html`** (PDF na życzenie).
@@ -42,7 +48,7 @@ Standardowo powstają **`reading.md` + `reading.html`** (PDF na życzenie).
 # instalacja zależności (raz; czysty Python — bez kompilatora)
 py -3.13 -m pip install -r .claude/skills/hermetic-astrology/requirements.txt
 
-# karta natalna → JSON
+# karta natalna → JSON (data przykładowa)
 py -3.13 .claude/skills/hermetic-astrology/compute/chart_engine.py \
   --dob 1993-06-14 --tob 15:40 --lat 54.35 --lon 18.65 --tz 2
 
