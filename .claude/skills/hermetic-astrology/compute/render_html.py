@@ -1017,14 +1017,19 @@ def extract_prose(text):
             cur[1].append(ln)
     out = []
     for title, ls in sections:
-        paras, buf = [], []
+        paras, buf, skip = [], [], False
         for l in ls:
-            if is_art(l):
-                continue
             if not l.strip():
+                skip = False
                 if buf:
                     paras.append(buf)
                     buf = []
+                continue
+            # "Key aspects" datum blocks are re-rendered natively; drop the
+            # whole paragraph, not just the first line
+            if l.strip().startswith(("Kluczowe aspekty", "Key aspects")):
+                skip = True
+            if skip or is_art(l):
                 continue
             if buf and not l.startswith("  ") and MARKER.match(l.lstrip()):
                 paras.append(buf)
@@ -1230,9 +1235,10 @@ def transit_timeline(tr, lang, mark_date=None):
                        f"{y + 20.5} {exx - 4.5:.0f},{y + 14.5}'/>")
         name = t["planets"].get(w["natal"], w["natal"])
         rx = " Rx" if w.get("retro") else ""
+        side = w.get("side", "")
         lab = (f"{PLANET_GLYPH.get(w['body'], '')}{rx} "
                f"{ASPECT_GLYPH[w['aspect']]} "
-               f"{PLANET_GLYPH.get(w['natal'], '')} {name} "
+               f"{side}{PLANET_GLYPH.get(w['natal'], '')} {name} "
                f"· {w['min_orb']:.1f}°")
         out.append(f"<text class='glyph' x='8' y='{y + 19}'>{esc(lab)}</text>")
     # lunation axis
@@ -1284,14 +1290,15 @@ def ambient_html():
             f"{ring}{stars}</div>")
 
 
-def topbar(lang, has_transits=False):
+def topbar(lang, has_transits=False, links=None):
     u = UI[lang]
-    links = [("#kolo", u["nav_wheel"]), ("#tozsamosc", u["nav_tozs"]),
-             ("#domy", u["nav_houses"]), ("#sygnatura", u["nav_sig"])]
-    if has_transits:
-        links.append(("#tranzyty", u["nav_transits"]))
-    links.append(("#reading", u["nav_read"]))
-    links.append(("#mechanizm", u["nav_mech"]))
+    if links is None:
+        links = [("#kolo", u["nav_wheel"]), ("#tozsamosc", u["nav_tozs"]),
+                 ("#domy", u["nav_houses"]), ("#sygnatura", u["nav_sig"])]
+        if has_transits:
+            links.append(("#tranzyty", u["nav_transits"]))
+        links.append(("#reading", u["nav_read"]))
+        links.append(("#mechanizm", u["nav_mech"]))
     nav = "".join(f"<a href='{h}'>{esc(n)}</a>" for h, n in links)
     return (f"<nav class='topbar' aria-label='{esc(u['nav_label'])}'>"
             f"<button class='orrery' id='totop' aria-label='{esc(u['totop'])}' "
@@ -1478,6 +1485,24 @@ def build(chart, reading_text, lang, title, transits=None, mark_date=None):
               "psychological, or financial advice. “As above, so below; know thyself.”",
     }[lang]
 
+    # transit/period readings carry no 2/5/6 prose — skip empty sections and
+    # their nav links instead of rendering bare headings
+    tozs = sec_prose('2', titled=False)
+    domy = sec_prose('5', titled=False)
+    tozs_sec = (f"<section id=\"tozsamosc\"><h2>{esc(u['nav_tozs'])}</h2>"
+                f"{tozs}</section>") if tozs else ""
+    domy_sec = (f"<section id=\"domy\"><h2>{esc(u['nav_houses'])}</h2>"
+                f"{domy}</section>") if domy else ""
+    nav_links = [("#kolo", u["nav_wheel"])]
+    if tozs:
+        nav_links.append(("#tozsamosc", u["nav_tozs"]))
+    if domy:
+        nav_links.append(("#domy", u["nav_houses"]))
+    nav_links.append(("#sygnatura", u["nav_sig"]))
+    if transits:
+        nav_links.append(("#tranzyty", u["nav_transits"]))
+    nav_links += [("#reading", u["nav_read"]), ("#mechanizm", u["nav_mech"])]
+
     return f"""<!DOCTYPE html>
 <html lang="{lang}">
 <head>
@@ -1490,7 +1515,7 @@ if(_t)document.documentElement.setAttribute('data-theme',_t);}}catch(e){{}}</scr
 </head>
 <body>
 <a class="skip" href="#reading">{esc(u['skip'])}</a>
-{topbar(lang, has_transits=bool(transits))}
+{topbar(lang, links=nav_links)}
 {ambient_html()}
 <main>
 <header class="title">
@@ -1504,8 +1529,8 @@ if(_t)document.documentElement.setAttribute('data-theme',_t);}}catch(e){{}}</scr
   <div class="wheelwrap">{wheel_svg(chart, lang)}
     <div>{balance_bars(chart, lang)}</div></div>
 </section>
-<section id="tozsamosc"><h2>{esc(u['nav_tozs'])}</h2>{sec_prose('2', titled=False)}</section>
-<section id="domy"><h2>{esc(u['nav_houses'])}</h2>{sec_prose('5', titled=False)}</section>
+{tozs_sec}
+{domy_sec}
 <section id="sygnatura"><h2>{esc(u['signature'])}</h2>{signature_panel(chart, lang)}
 {sec_prose('6', titled=False)}</section>
 {(f"<section id='tranzyty'><h2>{esc(u['timeline'])}</h2>"
@@ -1516,6 +1541,7 @@ if(_t)document.documentElement.setAttribute('data-theme',_t);}}catch(e){{}}</scr
 <section id="mechanizm" class="closed">
 <h2 aria-expanded="false">{esc(u['mech_title'])}</h2>
 <p class="mech-hint">{esc(u['mech_hint'])}</p>
+{sec_prose('1', titled=False)}
 <h3 class="mech-h3">{esc(u['positions'])}</h3>{scrollx(positions_table(chart, lang), u['positions'])}
 <h3 class="mech-h3">{esc(u['dignity'])}</h3>{scrollx(dignity_table(chart, lang), u['dignity'])}
 {sec_prose('3', titled=False)}

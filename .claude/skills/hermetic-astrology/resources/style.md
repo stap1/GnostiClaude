@@ -72,6 +72,11 @@ beautiful, but never louder than the dial.
   tables belong to the collapsed MECHANIZM section at the end of the page;
   in HTML the wheel's chords carry hover tooltips with aspect + orb, so the
   springs can be inspected without opening the case-back.
+- **Synastry follows the same watch:** `render_html_synastry.py` keeps
+  wheels → identities → composite → reading on the dial; the inter-aspect
+  table, house overlays and the FOKUS METODY commentary (chart-fit,
+  DAR/CIEŃ datum walk-through) fold into the same collapsed MECHANIZM
+  annex.
 
 ## What stays
 

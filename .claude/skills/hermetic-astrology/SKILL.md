@@ -257,8 +257,11 @@ Run only the block matching the requested **method**:
   "string activations" (a transit on one endpoint of a tight inter-aspect lights the
   whole string), lunations in composite houses; 3) reading = composite portrait + slow
   currents + relationship calendar + narrative. Save to
-  `output/synastria/<A>_x_<B>_<date>_tranzyt-<okres>/`. HTML: add
-  `--composite composite.json` to the synastry exporter (adds the relationship wheel).
+  `output/synastria/<A>_x_<B>_<date>_tranzyt-<okres>/` — with `synastry.json`,
+  `composite.json` AND `transits.json` beside `reading.md` (every engine JSON the
+  render needs lives in the reading's folder). HTML: the synastry exporter with
+  `--composite composite.json --transits transits.json --mark-date <reading-date>`
+  (relationship wheel + the same transit timeline as natal transit readings).
 - **Solar return (year-ahead):** chart for the moment the Sun returns to its natal degree
   in the target year; read its Ascendant, angular planets, and Moon for the year's themes.
   Compute Mode: find the moment by iterating — run the engine near the birthday, compare
@@ -362,9 +365,25 @@ raw engine JSON beside it as `chart.json` (`synastry.json` for synastry). Tell t
 the exact saved path. See `output/README.md` for the convention.
 
 **Standard outputs: `reading.md` + `reading.html`. PDF ONLY when the user asks.**
+
+Canonical render commands — ONE per reading type; every HTML output shares the same
+skeleton shell (topbar + orrery, glossary sheet, light theme, mobile accordion,
+collapsed ⚙ MECHANIZM annex, muted in-prose datums):
+
 ```bash
+# natal (also solar return — render the return chart the same way)
 py -3.13 compute/render_html.py chart.json --reading reading.md --lang pl \
     --out reading.html --title "..."
+# tranzyty na okres (natal + timeline)
+py -3.13 compute/render_html.py chart.json --reading reading.md \
+    --transits transits.json --mark-date <reading-date> --lang pl --out ... --title ...
+# synastria (+ kompozyt)
+py -3.13 compute/render_html_synastry.py chartA.json chartB.json synastry.json \
+    --composite composite.json --reading reading.md --lang pl --out ... --title ...
+# tranzyty relacji (synastria + kompozyt + timeline)
+py -3.13 compute/render_html_synastry.py chartA.json chartB.json synastry.json \
+    --composite composite.json --transits transits.json --mark-date <reading-date> \
+    --reading reading.md --lang pl --out ... --title ...
 # PDF — na życzenie (on explicit request only), via headless Edge:
 "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe" --headless=new \
     --disable-gpu --print-to-pdf="reading.pdf" --no-pdf-header-footer "file:///…/reading.html"
@@ -372,7 +391,9 @@ py -3.13 compute/render_html.py chart.json --reading reading.md --lang pl \
 `render_html.py` produces a self-contained, accessible HTML report (SVG chart wheel,
 semantic tables, balance bars, hermetic signature, lay-friendly hover/focus tooltips on
 technical terms, the reading's prose) with a print stylesheet — it needs `chart.json`
-and parses the prose out of `reading.md` automatically.
+and parses the prose out of `reading.md` automatically. The one-day snapshot
+(menu option 1) stays inline by design; if the user asks to keep it, render it as a
+period transit reading with a one-day window.
 
 Example: a career natal reading generated 2026-08-06 for a Leo →
 `output/2026-08-06/leo/natal/career/reading.md`.
