@@ -594,20 +594,25 @@ def esc(s):
 # ─────────────────────────────────────────────────────────────────────────────
 
 
-def wheel_svg(chart, lang):
+def wheel_svg(chart, lang, houseless=False):
     """Chart wheel. Radial layout (C=450, viewBox 900):
     430/380 sign ring · 380-369 tick band · 335/302/269 staggered planet
     glyphs with haloed degree labels at glyph-26 · 218/190 house-number band
-    · chords inside r=186."""
+    · chords inside r=186.
+
+    houseless=True draws the same wheel with no cusps, house numbers or
+    AC/MC labels and orients it to 0° Aries — for charts whose birth time
+    is unknown, where those would be fabricated precision."""
     asc = chart["angles"]["Ascendant"]["lon"]
     mc = chart["angles"]["Midheaven"]["lon"]
     cusps = chart["house_cusps"]
     planets = chart["planets"]
     lots = chart.get("lots", {})
     C = 450
+    origin = 0.0 if houseless else asc
 
     def xy(lon, r):
-        th = math.radians(180.0 - (lon - asc))
+        th = math.radians(180.0 - (lon - origin))
         return C + r * math.cos(th), C + r * math.sin(th)
 
     def line(lon, r1, r2, cls, wdt=1.0, extra=""):
@@ -632,17 +637,18 @@ def wheel_svg(chart, lang):
         s.append(line(d, 380, 374 if d % 10 else 369, "tick", 0.7))
 
     # house cusps + numbers in the inner band
-    for i, cusp in enumerate(cusps):
-        axis = i in (0, 3, 6, 9)
-        s.append(line(cusp, 190, 380, "cusp" + (" axis" if axis else ""),
-                      2.6 if axis else 0.8))
-        hx, hy = xy((cusp + ((cusps[(i + 1) % 12] - cusp) % 360) / 2), 204)
-        s.append(f'<text x="{hx:.1f}" y="{hy:.1f}" class="hnum halo">{ROMAN[i]}</text>')
+    if not houseless:
+        for i, cusp in enumerate(cusps):
+            axis = i in (0, 3, 6, 9)
+            s.append(line(cusp, 190, 380, "cusp" + (" axis" if axis else ""),
+                          2.6 if axis else 0.8))
+            hx, hy = xy((cusp + ((cusps[(i + 1) % 12] - cusp) % 360) / 2), 204)
+            s.append(f'<text x="{hx:.1f}" y="{hy:.1f}" class="hnum halo">{ROMAN[i]}</text>')
 
-    # AC / MC labels on the axes, inside the sign band, haloed
-    for lon, lab in ((asc, "AC"), (mc, "MC")):
-        lx, ly = xy(lon, 397)
-        s.append(f'<text x="{lx:.1f}" y="{ly:.1f}" class="axis-lab halo">{lab}</text>')
+        # AC / MC labels on the axes, inside the sign band, haloed
+        for lon, lab in ((asc, "AC"), (mc, "MC")):
+            lx, ly = xy(lon, 397)
+            s.append(f'<text x="{lx:.1f}" y="{ly:.1f}" class="axis-lab halo">{lab}</text>')
 
     # planets + lots, radially staggered when angularly crowded
     order = [k for k in GRID_ORDER + ["South Node"] if k in planets]
@@ -722,7 +728,10 @@ def wheel_svg(chart, lang):
       transition:stroke-width .15s,opacity .15s}
     .chord:hover{stroke-width:4.2;opacity:1}
     """
-    desc = (f"{UI[lang]['wheel_desc']}: AC {chart['angles']['Ascendant']['position']}, "
+    desc = ({"pl": "Koło horoskopu bez domów — godzina urodzenia nieznana",
+             "en": "Chart wheel without houses — birth time unknown"}[lang]
+            if houseless else
+            f"{UI[lang]['wheel_desc']}: AC {chart['angles']['Ascendant']['position']}, "
             f"MC {chart['angles']['Midheaven']['position']}")
     return (f'<svg viewBox="0 0 900 900" role="img" aria-label="{esc(desc)}">'
             f"<style>{style}</style><title>{esc(desc)}</title>"
@@ -1041,8 +1050,13 @@ def extract_prose(text):
         # re-join words hyphenated across source line breaks
         texts = [re.sub(r"([a-ząćęłńóśźż])- ([a-ząćęłńóśźż])", r"\1\2", p)
                  for p in texts if p]
-        # drop the disclaimer (re-rendered natively in the footer)
-        texts = [p for p in texts if not p.startswith(("Ten odczyt", "This reading"))]
+        # drop the disclaimer (re-rendered natively in the footer). MARKER
+        # splits its closing motto onto its own paragraph — drop that too, so
+        # section 8 ends on its Nag Hammadi closer, not on the motto.
+        texts = [p for p in texts
+                 if not p.startswith(("Ten odczyt", "This reading"))
+                 and not p.lstrip("„“\"").startswith(("Jak na górze, tak na dole",
+                                                      "As above, so below"))]
         if texts:
             out.append((title, texts))
     conf = [c for c in conf if c and not set(c) <= {"─"}]

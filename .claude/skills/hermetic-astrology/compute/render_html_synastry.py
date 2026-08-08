@@ -49,18 +49,29 @@ TL_SPEED = {"Pluto": 0, "Neptune": 1, "Uranus": 2, "Saturn": 3, "Jupiter": 4,
 KEY_TARGETS = ("Sun", "Moon", "Venus", "AC", "MC")
 
 
-def pair_timeline_data(tr, max_rows=20):
+def pair_timeline_data(tr, max_rows=24, max_slow=12, max_strings=4):
     """Adapt synastry_transits.py JSON to the natal timeline schema:
     slow orbs become window-wide bands, composite hits and string
     activations become point events with ◆ markers (multiple exact dates
-    of one contact merge into a single row)."""
+    of one contact merge into a single row). Each kind gets a reserved
+    share of the rows, so background bands cannot crowd out the dated
+    events (and vice versa)."""
     w0, w1 = tr["meta"]["window"]
-    rows = []
+    # exact dates first: a band and its own exact hit are ONE row
+    exact_of = {}
+    for h in tr.get("composite_hits", []):
+        exact_of.setdefault((h["body"], h["aspect"], h["target"]), []
+                            ).append(h["date"])
+    slow = []
     for s in tr.get("slow_orbs", []):
-        rows.append({"body": s["body"], "natal": s["target"],
+        key = (s["body"], s["aspect"], s["target"])
+        slow.append({"body": s["body"], "natal": s["target"],
                      "aspect": s["aspect"], "angle": ANGLE_OF[s["aspect"]],
                      "start": w0, "end": w1,
+                     "exact": exact_of.pop(key, []),
                      "min_orb": min(s["orb_start"], s["orb_end"])})
+    slow.sort(key=lambda r: (r["min_orb"], TL_SPEED.get(r["body"], 9)))
+    rows = slow[:max_slow]
     strings = {}
     for s in tr.get("string_activations", []):
         side, _, pt = s["endpoint"].partition(".")
@@ -72,18 +83,15 @@ def pair_timeline_data(tr, max_rows=20):
         r = strings[(s["body"], s["endpoint"])]
         r["exact"].append(s["date"])
         r["start"], r["end"] = min(r["start"], s["date"]), max(r["end"], s["date"])
-    rows += list(strings.values())
+    rows += sorted(strings.values(),
+                   key=lambda r: -len(r["exact"]))[:max_strings]
     hits = {}
-    for h in tr.get("composite_hits", []):
-        k = (h["body"], h["aspect"], h["target"])
-        hits.setdefault(k, {"body": h["body"], "natal": h["target"],
-                            "aspect": h["aspect"],
-                            "angle": ANGLE_OF[h["aspect"]],
-                            "start": h["date"], "end": h["date"],
-                            "exact": [], "min_orb": 0.0})
-        r = hits[k]
-        r["exact"].append(h["date"])
-        r["start"], r["end"] = min(r["start"], h["date"]), max(r["end"], h["date"])
+    for (body, aspect, target), dates in exact_of.items():
+        hits[(body, aspect, target)] = {
+            "body": body, "natal": target, "aspect": aspect,
+            "angle": ANGLE_OF[aspect],
+            "start": min(dates), "end": max(dates),
+            "exact": sorted(dates), "min_orb": 0.0}
     ordered = sorted(hits.values(), key=lambda r: (
         TL_SPEED.get(r["body"], 9),
         0 if r["natal"] in KEY_TARGETS else 1,
@@ -156,6 +164,8 @@ EXTRA_CSS = """
   grid-template-columns:repeat(auto-fit,minmax(min(340px,100%),1fr));
   gap:20px;align-items:start}
 .duo h3{text-align:center;color:var(--gold);font-weight:normal;margin:6px 0}
+.duo h3 small.nohouses{display:block;color:var(--muted);font-size:12.5px;
+  font-style:italic;margin-top:2px}
 .duo svg{width:100%;height:auto}
 .overlays{display:grid;
   grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));
@@ -182,6 +192,9 @@ def main():
     p.add_argument("--transits", help="transits.json (to the composite, from "
                    "synastry_transits.py) — adds the transit-timeline section")
     p.add_argument("--mark-date", help="YYYY-MM-DD to mark on the timeline")
+    p.add_argument("--no-houses-b", action="store_true",
+                   help="B's birth time is unknown: draw B's wheel (and the "
+                        "composite) without cusps, house numbers or AC/MC")
     p.add_argument("--reading")
     p.add_argument("--lang", default="pl", choices=["en", "pl"])
     p.add_argument("--out", required=True)
@@ -202,6 +215,11 @@ def main():
     title = args.title or f"Synastria — {nameA} × {nameB}"
 
     us = UI_SYN[lang]
+    nohb = args.no_houses_b
+    nohb_note = ("<small class='nohouses'>" + {
+        'pl': 'godzina urodzenia nieznana — koło bez domów i osi',
+        'en': 'birth time unknown — wheel without houses or angles',
+    }[lang] + "</small>") if nohb else ""
     prose, conf = extract_prose(reading) if reading else ([], [])
     groups = {"tozs": [], "komp": [], "read": [], "mech": []}
     for pt, paras in prose:
@@ -215,7 +233,8 @@ def main():
         comp = json.load(open(args.composite, encoding="utf-8"))
         comp_wheel = (
             f"<div class='wheelwrap' style='max-width:640px;margin:0 auto'>"
-            f"{wheel_svg(comp, lang)}{balance_bars(comp, lang)}</div>")
+            f"{wheel_svg(comp, lang, houseless=nohb)}"
+            f"{balance_bars(comp, lang)}</div>")
     composite_section = ""
     if comp_wheel or komp_prose:
         composite_section = (
@@ -307,7 +326,7 @@ if(_t)document.documentElement.setAttribute('data-theme',_t);}}catch(e){{}}</scr
 </div>
 <section class="duo" id="kola">
   <div><h3>A · {esc(nameA)}</h3>{wheel_svg(A, lang)}{balance_bars(A, lang)}</div>
-  <div><h3>B · {esc(nameB)}</h3>{wheel_svg(B, lang)}{balance_bars(B, lang)}</div>
+  <div><h3>B · {esc(nameB)}{nohb_note}</h3>{wheel_svg(B, lang, houseless=nohb)}{balance_bars(B, lang)}</div>
 </section>
 {tozs_section}
 {composite_section}

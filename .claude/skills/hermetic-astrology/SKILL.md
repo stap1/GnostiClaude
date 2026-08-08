@@ -257,9 +257,10 @@ Run only the block matching the requested **method**:
   "string activations" (a transit on one endpoint of a tight inter-aspect lights the
   whole string), lunations in composite houses; 3) reading = composite portrait + slow
   currents + relationship calendar + narrative. Save to
-  `output/synastria/<A>_x_<B>_<date>_tranzyt-<okres>/` — with `synastry.json`,
-  `composite.json` AND `transits.json` beside `reading.md` (every engine JSON the
-  render needs lives in the reading's folder). HTML: the synastry exporter with
+  `output/synastria/<A>_x_<B>_<date>_tranzyt-<okres>/` — with `chartA.json`,
+  `chartB.json`, `synastry.json`, `composite.json` AND `transits.json` beside
+  `reading.md`, so the folder renders on its own (same rule for the `_relacja`
+  folder, minus transits). HTML: the synastry exporter with
   `--composite composite.json --transits transits.json --mark-date <reading-date>`
   (relationship wheel + the same transit timeline as natal transit readings).
 - **Solar return (year-ahead):** chart for the moment the Sun returns to its natal degree

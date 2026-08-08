@@ -77,6 +77,11 @@ beautiful, but never louder than the dial.
   table, house overlays and the FOKUS METODY commentary (chart-fit,
   DAR/CIEŃ datum walk-through) fold into the same collapsed MECHANIZM
   annex.
+- **Never start a prose line with a glyph, `AC `/`MC `, `→` or `„`:** the
+  exporter treats those as list markers and splits the paragraph there.
+  Reflow the line (`jego Księżyc siada na jej Wenus (☽A ☌ ♀B)` instead of
+  a line opening with `☽A`). Deliberate list items — the `→` lines under a
+  table — are exactly what the rule is for, so leave those alone.
 
 ## What stays
 
