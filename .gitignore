@@ -1,0 +1,17 @@
+# Efemeryda JPL — 17 MB, silnik pobiera ją sam przy pierwszym uruchomieniu
+.claude/skills/hermetic-astrology/compute/de421.bsp
+
+# Artefakty Pythona
+__pycache__/
+*.pyc
+
+# Lokalne ustawienia Claude Code (uprawnienia tej maszyny)
+.claude/settings.local.json
+
+# Odczyty zawierają prywatne dane urodzeniowe realnych osób — nie eksportować
+output/*
+!output/README.md
+
+# Paczki eksportowe
+export/
+APOKRYFY*.pdf

@@ -1,0 +1,4 @@
+# Hermetic Astrology — Compute Mode dependencies
+# Skyfield is pure-Python and installs from wheels (no C++ compiler needed).
+# The JPL de421 ephemeris (~17 MB) is downloaded once and cached in compute/.
+skyfield>=1.49
