@@ -1,8 +1,7 @@
 # Aspects — The Geometry of Relationship
 
 Aspects are the angular relationships between planets — the chart's "wiring." They
-are the central predictive/interpretive mechanism of Western astrology (and the
-biggest technical difference from the Vedic house-based aspect system). An aspect is
+are the central predictive/interpretive mechanism of Western astrology. An aspect is
 counted when two bodies are within **orb** of an exact angle.
 
 ## Major (Ptolemaic) Aspects

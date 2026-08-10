@@ -1,17 +1,14 @@
 ---
 name: hermetic-astrology
 description: >
-  Western/European tropical astrology with a Hermetic foundation. Casts and interprets
-  natal birth charts, transits, synastry (compatibility), solar returns, and electional
-  timing (planetary hours). Triggers when the user gives a name and/or birth date (with or
-  without time and place) and asks for a birth chart, natal reading, horoscope, star chart,
-  "what's my rising/Sun/Moon sign", planetary positions, aspects, essential dignities,
-  compatibility between two people, a year-ahead / solar-return reading, current transits,
-  or a good time (planetary hour) to do something. Also triggers on "read my chart",
-  "cast my horoscope", "astrology reading", "natal chart", "zodiac reading". Uses the
-  tropical zodiac and classical/Hermetic technique (essential dignities, Ptolemaic aspects,
-  Egyptian terms, Chaldean faces/decans, chart sect, planetary hours). Always proceed even
-  if birth time or place is approximate or missing — flag the uncertainty and continue.
+  Western tropical astrology on a classical/Hermetic foundation: natal charts, transits,
+  synastry (compatibility), solar returns, and electional timing (planetary hours).
+  Triggers on a birth date and/or an astrology ask — natal chart, horoscope, "read my
+  chart", rising/Sun/Moon sign, planetary positions, aspects, dignities, compatibility
+  of two people, year-ahead reading, current transits, or a good time for an undertaking.
+  Technique: essential dignities, Ptolemaic aspects, Egyptian terms, decans, sect,
+  planetary hours. Always proceed even if birth time or place is approximate or missing —
+  flag the uncertainty and continue.
 ---
 
 # Hermetic Astrology — Western Tropical Chart Engine
@@ -19,9 +16,8 @@ description: >
 A traditional/Hermetic Western astrology engine. It casts a geocentric **tropical** chart
 and interprets it through the classical apparatus — essential dignities, Ptolemaic aspects,
 terms, faces, sect, and planetary hours — framed by the Hermetic principle *"as above, so
-below"* (see `resources/hermetic-principles.md`). It is derived structurally from a Vedic
-Jyotish skill but rebuilt for the European tradition: **tropical zodiac (no ayanamsa),
-aspect-based (not house-aspect), and dignity-based strength.**
+below"* (see `resources/hermetic-principles.md`). Foundations: **tropical zodiac
+(no ayanamsa), aspect-based interpretation, and dignity-based strength.**
 
 ## EXECUTION MODES
 
@@ -135,18 +131,9 @@ balance bars, hermetic panel) — paste them into the template and write only th
   it is the most robust without exact time.
 - Compute **aspects** by comparing longitudes to the angles in `resources/aspects.md`.
 
-**Output — the chart table:**
-```
-NATAL CHART — Tropical / [House System]
-Planet      | Sign          | Deg     | House | Dignity        | Motion
-------------+---------------+---------+-------+----------------+--------
-Ascendant   | [Sign]        | [d°m']  |  1    | —              | —
-Sun         | [Sign]        | [d°m']  | [H]   | [dignities]    | —
-Moon        | [Sign]        | [d°m']  | [H]   | [dignities]    | —
-Mercury …   | …             | …       | …     | …              | R?
-...
-Midheaven   | [Sign]        | [d°m']  | 10    | —              | —
-```
+**Output — the chart table:** columns `Planet | Sign | Deg (d°m′) | House | Dignity |
+Motion (R?)`; Ascendant first, Midheaven last. The finished geometry comes from
+`render_chart.py` (Compute Mode) or the template (Prompt Mode).
 → Reference: `resources/planets.md`, `resources/signs.md`, `resources/houses.md`.
 
 ---
@@ -173,14 +160,8 @@ classical planets, read its dignities and condition (Compute Mode supplies `dign
 (cazimi / combust / under beams / free); in Prompt Mode derive them from
 `resources/dignities.md` and `resources/planets.md`):
 
-```
-DIGNITY & CONDITION
-Planet   | Sign      | Dignities                | Score | Sect status
----------+-----------+--------------------------+-------+-------------
-Sun      | Leo       | Domicile, Triplicity     |  +8   | of sect (day)
-Mars     | Cancer    | Fall                     |  −4   | contrary
-...
-```
+Table columns: `Planet | Sign | Dignities | Score | Sect status` (e.g. Sun in Leo —
+Domicile + Triplicity, +8, of sect (day)).
 Temper each essential score with **accidental** condition — house angularity, retrograde,
 combustion, aspects from benefics/malefics. Reference: `resources/dignities.md`,
 `resources/planets.md` (sect).
@@ -237,6 +218,9 @@ Run only the block matching the requested **method**:
 - **Natal** (default): full synthesis of Steps 2–6.
 - **Transits:** cast a second chart for the target date; report current planets aspecting
   natal planets/angles (esp. Saturn, Jupiter, and the outer planets); give time windows.
+  Compute Mode: `py -3.13 compute/transits.py chart.json --from YYYY-MM-DD --to YYYY-MM-DD
+  > transits.json` (slow-planet windows + lunations) — feeds the HTML timeline via
+  `--transits`/`--mark-date` (Step 9).
 - **Synastry (compatibility):** cast both charts, then run
   `py -3.13 compute/synastry.py chartA.json chartB.json --nameA "..." --nameB "..."`
   → JSON with `inter_aspects` (same orbs as natal, luminary bonus), `overlays_B_in_A` /
@@ -294,34 +278,17 @@ Chart ruler & luminaries (Sun/Moon)  >  tight applying aspects & angular planets
 - **Step 8 structure (ALL readings):** three "· X ·" subsections: **· NARRACJA GWIAZD ·**
   → **· SYNTEZA ·** (the technical weave with glyphs) → **· WSKAZÓWKI ·** (concrete
   practices + the closing quote). The narracja is flowing prose with NO glyphs and no
-  jargon, warm but non-flattering, every claim chart-anchored. Flavours by method:
-  **NATAL — 450–700 words, second person, five movements** (flowing prose, no subheads):
-  1) *wejście przez konkret* — open from one chart datum or a sensory detail, never a
-  symmetrical portrait; 2) *mechanika wewnętrzna* — HOW the psyche runs: the dispositor
-  chain told as an inner hierarchy ("kto komu oddaje klucze"), loops (receptions), the
-  felt logic of the pattern; 3) *napięcie centralne* — the chart's core paradox held
-  OPEN through at least one lived micro-scene (a meeting, a morning, a doorway), both
-  poles shown working at once; 4) *cień* — the real cost of the pattern; at least one
-  paragraph stays unsoftened, no instant reframe; 5) *ruch* — the development arc with
-  a recognition test ("po czym poznasz, że…"); advice itself belongs to WSKAZÓWKI.
-  Techniques: ONE chart-derived leitmotif image recurring 2–3 times and evolving; ≤2
-  direct questions to the reader; time depth phrased as tendency (never biographical
-  claims, never diagnoses); the author may briefly step in first-person ("nie będę tego
-  wygładzał"). Depth comes from specificity and scenes, not ornament — all style.md
-  budgets still bind.
-  **SYNASTRIA — 250–400 words**, third person by name/sign (gender rules): how the two
-  meet, what flows by itself, where they rub, ONE lived scene of the pair, what each
-  learns from the other. **TRANZYTY — 200–300 words**: the weather of the period, its
-  arc, one concrete scene; coarse timing only ("początek sierpnia") — dates stay in the
-  calendar.
+  jargon, warm but non-flattering, every claim chart-anchored. Its per-method spec —
+  word budgets, the natal five-movement arc, synastry/transit flavours, techniques —
+  is in `resources/style.md` → "NARRACJA by method"; follow it exactly.
 - **Prose style (mandatory):** follow the anti-slop budgets in `resources/style.md`
   (contrast/triad/aphorism limits, one chart-derived imagery domain per reading, stock
   metaphors banned, varied sentence rhythm, one unsoftened shadow). Before rendering,
   run `py -3.13 compute/style_check.py reading.md` and fix the warnings it reports.
 - **Synthesis closer (mandatory style):** do not end Step 8 with the Hermetic motto — it
-  already closes the disclaimer footer. Pick ONE theme-matched Nag Hammadi quote from the
-  Closing-Quote Bank in `resources/gnosis.md` and attribute it (e.g. "Ewangelia Tomasza,
-  log. 70"). Vary the quote across a person's readings.
+  already closes the disclaimer footer. Pick ONE theme-matched Nag Hammadi quote from
+  `resources/gnosis-quotes.md` and attribute it (e.g. "Ewangelia Tomasza, log. 70").
+  Vary the quote across a person's readings.
 - **Each reading is self-contained (mandatory):** treat every birth date as a separate
   individual. NEVER reference any other reading document — not other subjects' readings,
   not the same person's earlier readings, not alternative birth-time variants ("see the
@@ -345,8 +312,8 @@ output/<zodiak>_<dob>/<dob>_<reading-date>_<method>_<purpose>/reading.md
 ```
 
 - **`<zodiak>`** — the subject's tropical Sun sign in POLISH, lowercase, ASCII (no
-  diacritics): `baran byk bliznieta rak lew panna waga skorpion strzelec kozioroziec→
-  koziorozec wodnik ryby`.
+  diacritics): `baran byk bliznieta rak lew panna waga skorpion strzelec koziorozec
+  wodnik ryby`.
 - **`<dob>`** — birth date `YYYY-MM-DD`; **`<reading-date>`** — generation date.
 - **`<method>`** — `natal` | `transits` | `solar-return` | `electional`.
 - **`<purpose>`** — kebab-case, Polish (e.g. `ogolny`, `kariera`, `relacja`,
@@ -396,9 +363,6 @@ and parses the prose out of `reading.md` automatically. The one-day snapshot
 (menu option 1) stays inline by design; if the user asks to keep it, render it as a
 period transit reading with a one-day window.
 
-Example: a career natal reading generated 2026-08-06 for a Leo →
-`output/2026-08-06/leo/natal/career/reading.md`.
-
 ---
 
 ## FINAL — DISCLAIMER FOOTER
@@ -428,8 +392,9 @@ financial advice. "As above, so below; know thyself."
 | `resources/hermetic-principles.md` | "As above so below", 7 principles, ethics/stance | Steps 6, 8 |
 | `resources/planetary-hours.md` | Chaldean order, day/hour rulers, election | Steps 6, 7 (electional) |
 | `resources/lots.md` | Hermetic lots (⊕ Fortune, ⊗ Spirit) — formulas & reading | Step 6 |
-| `resources/gnosis.md` | Christian-Gnostic layer: planetary garments, heimarmene, anamnesis | Steps 6, 8 |
-| `resources/style.md` | anti-slop prose rules: budgets, imagery domains, rhythm | Step 8 |
+| `resources/gnosis.md` | Christian-Gnostic layer: garments, heimarmene, anamnesis (optional depth) | Step 6 |
+| `resources/gnosis-quotes.md` | Nag Hammadi closing-quote bank (mandatory Step-8 closer) | Step 8 |
+| `resources/style.md` | anti-slop prose rules + NARRACJA per-method spec | Step 8 |
 | `compute/style_check.py` | prose linter — counts anti-pattern budgets in reading.md | Step 9 |
 | `templates/full-reading.md` | Final report skeleton + geometry rules | Step 9 assembly |
 | `compute/chart_engine.py` | Skyfield/de421 computation engine | Step 1 (Compute Mode) |

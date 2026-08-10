@@ -2,7 +2,7 @@
 
 The **tropical** zodiac (Western/European) is measured from the vernal equinox
 (0° Aries = the Sun's position at the spring equinox), NOT from the fixed stars.
-This is the key difference from the Vedic/sidereal zodiac. No ayanamsa is applied.
+This is the key difference from the sidereal zodiac. No ayanamsa is applied.
 
 ## The Four Elements (Triplicities)
 

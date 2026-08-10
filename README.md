@@ -5,11 +5,9 @@ dla [Claude Code](https://claude.com/claude-code). Liczy karty z dokładnością
 efemeryd JPL, interpretuje w duchu tradycji klasycznej („jak na górze, tak na dole")
 i zapisuje piękne raporty — tekstowe oraz HTML z kołem horoskopu SVG.
 
-> Projekt wywodzi się architektonicznie ze skilla
-> [Vedic-Astrology-Skill](https://github.com/deepanshutomar/Vedic-Astrology-Skill-),
-> ale treść i silnik zbudowano od nowa dla tradycji europejskiej: zodiak tropikalny
-> (bez ayanamsy), aspekty ptolemejskie, godności esencjalne z sektą, terminy
-> egipskie, oblicza chaldejskie, loty hermetyczne i godziny planetarne.
+> Tradycja klasyczna/europejska w pełnym aparacie: zodiak tropikalny (bez ayanamsy),
+> aspekty ptolemejskie, godności esencjalne z sektą, terminy egipskie, oblicza
+> chaldejskie, loty hermetyczne i godziny planetarne.
 
 ## Możliwości (6 metod odczytu)
 

@@ -83,6 +83,30 @@ beautiful, but never louder than the dial.
   a line opening with `☽A`). Deliberate list items — the `→` lines under a
   table — are exactly what the rule is for, so leave those alone.
 
+## NARRACJA by method (Step-8 spec)
+
+**NATAL — 450–700 words, second person, five movements** (flowing prose, no subheads):
+1) *wejście przez konkret* — open from one chart datum or a sensory detail, never a
+symmetrical portrait; 2) *mechanika wewnętrzna* — HOW the psyche runs: the dispositor
+chain told as an inner hierarchy ("kto komu oddaje klucze"), loops (receptions), the
+felt logic of the pattern; 3) *napięcie centralne* — the chart's core paradox held
+OPEN through at least one lived micro-scene (a meeting, a morning, a doorway), both
+poles shown working at once; 4) *cień* — the real cost of the pattern; at least one
+paragraph stays unsoftened, no instant reframe; 5) *ruch* — the development arc with
+a recognition test ("po czym poznasz, że…"); advice itself belongs to WSKAZÓWKI.
+Techniques: ONE chart-derived leitmotif image recurring 2–3 times and evolving; ≤2
+direct questions to the reader; time depth phrased as tendency (never biographical
+claims, never diagnoses); the author may briefly step in first-person ("nie będę tego
+wygładzał"). Depth comes from specificity and scenes, not ornament — all budgets
+above still bind.
+
+**SYNASTRIA — 250–400 words**, third person by name/sign (gender rules in SKILL.md
+Step 8): how the two meet, what flows by itself, where they rub, ONE lived scene of
+the pair, what each learns from the other.
+
+**TRANZYTY — 200–300 words**: the weather of the period, its arc, one concrete scene;
+coarse timing only ("początek sierpnia") — dates stay in the calendar.
+
 ## What stays
 
 Data anchoring (every claim traceable to a placement), Polish astrological

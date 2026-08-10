@@ -1,9 +1,9 @@
 # Essential Dignities — Traditional Planetary Strength
 
 Essential dignity measures how much a planet is "at home" in its zodiacal position —
-its ability to act with clarity and produce its natural effects. This is the Western/
-Hermetic equivalent of the Vedic strength system, but built on the **five dignities**
-of Ptolemy and William Lilly. The engine computes all five plus a numeric score.
+its ability to act with clarity and produce its natural effects. It is built on the
+**five dignities** of Ptolemy and William Lilly. The engine computes all five plus
+a numeric score.
 
 ## The Five Essential Dignities (with Lilly's scoring)
 
